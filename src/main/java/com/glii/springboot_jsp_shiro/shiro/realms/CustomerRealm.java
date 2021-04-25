@@ -3,6 +3,7 @@ package com.glii.springboot_jsp_shiro.shiro.realms;
 import com.glii.springboot_jsp_shiro.entity.Perms;
 import com.glii.springboot_jsp_shiro.entity.Role;
 import com.glii.springboot_jsp_shiro.entity.User;
+import com.glii.springboot_jsp_shiro.salt.MyByteSource;
 import com.glii.springboot_jsp_shiro.service.UserService;
 import com.glii.springboot_jsp_shiro.utils.ApplicationContextUtil;
 import org.apache.shiro.authc.AuthenticationException;
@@ -14,6 +15,7 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
@@ -21,13 +23,17 @@ import java.util.List;
 
 //自定义realm
 public class CustomerRealm extends AuthorizingRealm {
+
+    @Autowired
+    private UserService userService;
+
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         System.out.println("执行了=>doGetAuthorizationInfo");
         //获取身份信息
         String primaryPrincipal =(String) principalCollection.getPrimaryPrincipal();
         //根据主身份信息获取角色和权限信息
-        UserService userService = (UserService) ApplicationContextUtil.getBean("userService");
+//        UserService userService = (UserService) ApplicationContextUtil.getBean("userService");
         User user = userService.findRolesByUserName(primaryPrincipal);
         if (!CollectionUtils.isEmpty(user.getRoles())) {
             SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
@@ -60,10 +66,10 @@ public class CustomerRealm extends AuthorizingRealm {
         //根据身份信息
         String principal =(String) token.getPrincipal();
         //在工厂中获取service对象
-        UserService userService = (UserService) ApplicationContextUtil.getBean("userService");
+//        UserService userService = (UserService) ApplicationContextUtil.getBean("userService");
         User user = userService.findByUserName(principal);
         if (!ObjectUtils.isEmpty(user)) {
-            return new SimpleAuthenticationInfo(user.getAccount(), user.getPassword(), ByteSource.Util.bytes(user.getSalt()), this.getName());
+            return new SimpleAuthenticationInfo(user.getAccount(), user.getPassword(), new MyByteSource(user.getSalt()), this.getName());
         }
         return null;
     }

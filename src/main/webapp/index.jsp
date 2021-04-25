@@ -1,5 +1,6 @@
 <%@page contentType="text/html; UTF-8" pageEncoding="UTF-8" isELIgnored="false" %>
 <%@taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
+<%@ taglib prefix="SHIRO" uri="http://shiro.apache.org/tags" %>
 <!doctype html>
 <html lang="en">
 <head>
@@ -12,6 +13,16 @@
 <body>
     hello world!
     <h1>系统主页v1.0</h1>
+
+    <H1><shiro:principal/></H1>
+
+    <shiro:authenticated>
+        认证之后展示的内容<br>
+    </shiro:authenticated>
+    <shiro:notAuthenticated>
+        没有认证之后展示的内容<br>
+    </shiro:notAuthenticated>
+
     <a href="${pageContext.request.contextPath}/user/logout">用户退出</a>
     <ul>
         <shiro:hasAnyRoles name="user,admin">
